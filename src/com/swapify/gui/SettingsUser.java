@@ -35,40 +35,15 @@ public class SettingsUser extends HomeForm {
     public SettingsUser(Resources theme) {
         super(theme);
         tb = new Toolbar();
-        Image backIcon = FontImage.createMaterial(FontImage.MATERIAL_ARROW_BACK, "Retour", 5.0f);
         setToolbar(tb);
         tb.setTitle("Settings");
-        //button settings
-        Image SettingsIcon = FontImage.createMaterial(FontImage.MATERIAL_SETTINGS, "Retour", 5.0f);
-        tb.addCommandToSideMenu(new Command("Settings", SettingsIcon) {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                new SettingsUser(theme).show();
-            }
+                 tb.setBackCommand("", e -> {
+            new ProfilForm(theme).show();
         });
-        //button article
-        Image articleIcon = FontImage.createMaterial(FontImage.MATERIAL_CATEGORY, "Retour", 5.0f);
-        tb.addCommandToSideMenu(new Command("Articles", articleIcon) {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                new ArticleForm(theme).show();
-            }
-        });
-        //buuton logout
-        Image logoutIcon = FontImage.createMaterial(FontImage.MATERIAL_EXIT_TO_APP, "Logout", 4.0f);
-        Button logoutButton = new Button("Logout", logoutIcon);
-        tb.addCommandToSideMenu(new Command("logout", logoutIcon) {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                new LoginForm(theme).show();
-                SessionManager.pref.clearAll();
-                Storage.getInstance().clearStorage();
-                System.out.println("id user=" + SessionManager.getId());
-            }
-        });
-         
-      
-        // Ajouter une photo de profil circulaire
+         Image backIcon = FontImage.createMaterial(FontImage.MATERIAL_ARROW_BACK, "Retour", 5.0f);
+       
+        
+        // Ajoute une photo de profil circulaire
         String encodedImage = SessionManager.getPhoto();
         if (encodedImage != null) {
             byte[] imageData = Base64.decode(encodedImage.getBytes());

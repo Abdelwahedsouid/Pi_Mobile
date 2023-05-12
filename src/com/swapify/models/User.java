@@ -4,6 +4,8 @@
 package com.swapify.models;
 
 
+
+
 import java.util.Date;
 
 
@@ -16,10 +18,10 @@ public class User {
     private String password, name, sexe,email;
      
     private Date naissance;
-    // private int age, duree, is_block,;
+    private int  duree, is_block;
    // private String  reset_token, photo;
    // private Boolean isVerified;
-   // private LocalDateTime date_deblockage;
+    private  Date date_deblockage ,lastLogin;
 public User() {
     }
 
@@ -107,6 +109,38 @@ public User() {
 
     public void setNaissance(Date naissance) {
         this.naissance = naissance;
+    }
+
+    public int getDuree() {
+        return duree;
+    }
+
+    public void setDuree(int duree) {
+        this.duree = duree;
+    }
+
+    public int getIs_block() {
+        return is_block;
+    }
+
+    public void setIs_block(int is_block) {
+        this.is_block = is_block;
+    }
+
+    public Date getDate_deblockage() {
+        return date_deblockage;
+    }
+
+    public void setDate_deblockage(Date date_deblockage) {
+        this.date_deblockage = date_deblockage;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
     @Override

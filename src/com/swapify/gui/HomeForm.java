@@ -31,8 +31,9 @@ public class HomeForm extends Form {
         Toolbar tb = new Toolbar();
         setToolbar(tb);
         // Ajouter une image à gauche de la barre d'accueil
-        EncodedImage logoEncoded = EncodedImage.createFromImage(theme.getImage("logo.png"), false);// Remplacez "profile-picture.jpg" par le chemin de votre image de profil
-        ImageViewer logoImageViewer = new ImageViewer(logoEncoded);
+       Image logoScaled = theme.getImage("logo.png");
+        Image logo = logoScaled.scaled(logoScaled.getWidth() * 3, (int) (logoScaled.getHeight() * 2.5));
+        ImageViewer logoImageViewer = new ImageViewer(logo);
         Container LogoImageContainer = new Container(new BorderLayout());
         LogoImageContainer.add( BorderLayout.CENTER,logoImageViewer);
         tb.setTitleComponent(LogoImageContainer);
@@ -57,9 +58,7 @@ public class HomeForm extends Form {
             }
         });
         // Ajouter le reste du contenu de la page d'accueil ici
-
-        // TO DO 
-        // TO DO 
+             
         // sidebar au dessus de l'application           
         // conteneur pour les boutons au dessous
         Container buttonsContainer = new Container(new BorderLayout());
@@ -76,14 +75,20 @@ public class HomeForm extends Form {
         Button ChatButton = new Button("", ChatImg);
         Button HomeButton = new Button("", HomeImg);
 
+        
+        //actions sur l'ajout d'annonce
+        PlusButton.addPointerPressedListener((evt) -> {
+             AjoutAnnonceForm profileForm = new AjoutAnnonceForm(theme);
+            profileForm.show();
+        });
 //  actions pour les boutons
         profileButton.addActionListener((evt) -> {
             ProfilForm profileForm = new ProfilForm(theme);
             profileForm.show();
         });
         HomeButton.addActionListener((evt) -> {
-            HomeForm HomeForm = new HomeForm(theme);
-            HomeForm.show();
+            AffichageAnnonceForm homeForm = new AffichageAnnonceForm(theme);
+            homeForm.show();
         });
 
         //  boutons à gauche
@@ -100,7 +105,7 @@ public class HomeForm extends Form {
         buttonsContainer.add(BorderLayout.CENTER, PlusButton);
         // Ajouter le conteneur à la forme HomeForm
         add(BorderLayout.SOUTH, buttonsContainer);
-        buttonsContainer.setUIID("Button");
+        buttonsContainer.setUIID("Tab");
 
     }
 }

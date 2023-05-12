@@ -6,12 +6,15 @@
 package com.swapify.gui;
 
 
+import com.codename1.capture.Capture;
 import com.codename1.ui.Button;
 import com.codename1.ui.ButtonGroup;
 import com.codename1.ui.Component;
 import com.codename1.ui.Container;
 import com.codename1.ui.Dialog;
+import com.codename1.ui.Display;
 import com.codename1.ui.Form;
+import com.codename1.ui.Image;
 import com.codename1.ui.Label;
 import com.codename1.ui.RadioButton;
 import com.codename1.ui.TextField;
@@ -23,21 +26,39 @@ import com.codename1.ui.layouts.FlowLayout;
 import com.codename1.ui.spinner.Picker;
 import com.codename1.ui.util.Resources;
 import com.swapify.services.ServiceUser;
+import java.io.IOException;
 
 import java.text.SimpleDateFormat;
+
+
+
 
 /**
  *
  * @author abdel
  */
 public class SignUpForm extends Form {
-
+private Image image  ;
+private String path ;
     public SignUpForm(Resources theme) {
-
         super(new BorderLayout(BorderLayout.CENTER_BEHAVIOR_CENTER_ABSOLUTE));
         //ajouter l'image 
-        String btnChooseImage  ;
-        
+        Button selectImageBtn = new Button("Sélectionner une image");
+        Label l = new Label(); 
+            selectImageBtn.addActionListener((evt) -> {
+                 path =Capture.capturePhoto(Display.getInstance().getDisplayWidth(), -1);
+                if (path != null){
+                     try {
+                         image = Image.createImage(path);
+                         Image scaledImage = image.scaled(image.getWidth() / 3, image.getHeight() / 3);
+                         l.setIcon(scaledImage);
+                         revalidate();
+                     } catch (IOException ex) {
+                          ex.printStackTrace();
+                     }
+                }
+            });
+        add(BorderLayout.NORTH,BoxLayout.encloseY(selectImageBtn ,l));
         //ajouter les input
         TextField tNom = new TextField("", "");
         TextField tEmail = new TextField("", "");
@@ -94,7 +115,11 @@ public class SignUpForm extends Form {
                 if (name.isEmpty() || email.isEmpty() || password.isEmpty() || phone.isEmpty() || sexe.isEmpty() || formattedDate.isEmpty()) {
                     Dialog.show("Erreur", "Veuillez remplir tous les champs obligatoires", "OK", null);
                 } else {
-                    ServiceUser.getInstance().signup(name, email, password, phoneNumber, sexe, formattedDate);
+                    try {
+                        ServiceUser.getInstance().signup(name, email, password, phoneNumber, sexe, formattedDate, path);
+                    } catch (IOException ex) {
+                        
+                    }
                 }
             }
         }

@@ -1,19 +1,22 @@
 package com.swapify.services;
 
-import com.codename1.components.ImageViewer;
+import com.codename1.components.InteractionDialog;
 import com.codename1.io.CharArrayReader;
 import com.codename1.io.ConnectionRequest;
 import com.codename1.io.JSONParser;
 import com.codename1.io.MultipartRequest;
 import com.codename1.io.NetworkEvent;
 import com.codename1.io.NetworkManager;
+import com.codename1.ui.Button;
 import com.codename1.ui.Dialog;
-import com.codename1.ui.EncodedImage;
-import com.codename1.ui.Form;
+import com.codename1.ui.Label;
 import com.codename1.ui.events.ActionListener;
+import com.codename1.ui.layouts.BorderLayout;
+
 import com.codename1.ui.util.Resources;
-//import com.swapify.ProfileForm;
+
 import com.swapify.SessionManager;
+import com.swapify.gui.EnvoyerReclamationForm;
 import com.swapify.gui.HomeForm;
 import com.swapify.models.User;
 import com.swapify.util.Constantes;
@@ -46,21 +49,19 @@ public class ServiceUser {
         return instance;
 
     }
-    //add
 
     //sinup 
-    public void signup(String name, String email, String password, int phone, String sexe, String date) {
-
+    public void signup(String name, String email, String password, int phone, String sexe, String date, String photo) throws IOException {
+        MultipartRequest req = new MultipartRequest();
         String url = "http://127.0.0.1:8000/user/SinUp?name=" + name
                   + "&email=" + email
                   + "&phoneNumber=" + phone
                   + "&sexe=female&password=" + password
-                  + "&photo=12345"
                   + "&naissance=" + date;
-
+        String mime = "image/png";
+        req.addData("photo", photo, mime);
         req.setUrl(url);
-
-        req.setPost(false);
+        req.setPost(true);
 
         //execution du l'url
         req.addResponseListener((evt) -> {
@@ -89,11 +90,9 @@ public class ServiceUser {
         });
         //apres l'execution du l'url en attendre la reponse du serveur
         NetworkManager.getInstance().addToQueueAndWait(req);
-
     }
 
     public void signin(String email, String password, Resources rs) {
-
         String url = "http://127.0.0.1:8000/user/SinIn?email=" + email
                   + "&password=" + password;
         req = new ConnectionRequest(url, false);
@@ -113,18 +112,34 @@ public class ServiceUser {
                     Map<String, Object> user = j.parseJSON(new CharArrayReader(json.toCharArray()));
                     //Session 
                     float id = Float.parseFloat(user.get("id").toString());
-                    SessionManager.setId((int) id);//jibt id ta3 user ly3ml login w sajltha fi session ta3i
-
+                    float isBlock = Float.parseFloat(user.get("isBlock").toString());
+                    SessionManager.setId((int) id);
+                    SessionManager.setIsBlock((int) isBlock);
                     SessionManager.setPassowrd(user.get("password").toString());
                     SessionManager.setName(user.get("name").toString());
                     SessionManager.setEmail(user.get("email").toString());
-                    SessionManager.setPhoto(user.get("photo").toString());
                     if (user.get("photo") != null) {
                         SessionManager.setPhoto(user.get("photo").toString());
                     }
-                    System.err.println("email=" + SessionManager.getEmail() + "id" + SessionManager.getId() + "photo=" + SessionManager.getPhoto());
                     if (user.size() > 0) {
+                        if (SessionManager.getIsBlock() == 1) {
+                            new EnvoyerReclamationForm(rs).show();
+                         /*   InteractionDialog dialog = new InteractionDialog("Error");
+                            dialog.setLayout(new BorderLayout());
+
+                            Label label = new Label("You are blocked!");
+                            Button okButton = new Button("OK");
+
+                            okButton.addActionListener(evt -> {
+                                dialog.dispose();
+                               
+                            });
+                            dialog.addComponent(BorderLayout.CENTER, label);
+                            dialog.addComponent(BorderLayout.SOUTH, okButton);
+*/
+                        }else{
                         new HomeForm(rs).show();
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -135,12 +150,13 @@ public class ServiceUser {
 
         NetworkManager.getInstance().addToQueueAndWait(req);
     }
-  public void editProfil(String name, String email, String password) {
-    String url = "http://127.0.0.1:8000/user/edit?id=" +String.valueOf( SessionManager.getId())
-              + "&name=" + name
-              + "&email=" + email
-              + "&sexe=female"
-              + "&password="+ password ;
+
+    public void editProfil(String name, String email, String password) {
+        String url = "http://127.0.0.1:8000/user/edit?id=" + String.valueOf(SessionManager.getId())
+                  + "&name=" + name
+                  + "&email=" + email
+                  + "&sexe=female"
+                  + "&password=" + password;
         MultipartRequest req = new MultipartRequest();
         req.setUrl(url);
         req.setPost(true);
@@ -150,12 +166,12 @@ public class ServiceUser {
             String responseData = new String(data);
             // Check the response from the server
             if (responseData.equals("Account is modified")) {
-                 SessionManager.setPassowrd(password);
-                    SessionManager.setName(name);
-                    SessionManager.setEmail(email);
+                SessionManager.setPassowrd(password);
+                SessionManager.setName(name);
+                SessionManager.setEmail(email);
                 // Registration was successful
                 Dialog.show("Success", " Account is modified!", "OK", null);
-                
+
             } else {
 
                 // Server responded with a message
@@ -165,26 +181,6 @@ public class ServiceUser {
         });
         //apres l'execution du l'url en attendre la reponse du serveur
         NetworkManager.getInstance().addToQueueAndWait(req);
-    }
-
-    public void afficherUserPhoto() {
-
-        String imageUrl = "http://127.0.0.1:8000/user/display"; // URL de l'image
-        ConnectionRequest request = new ConnectionRequest();
-        request.setUrl(imageUrl);
-        request.setHttpMethod("GET");
-        request.addResponseListener(e -> {
-            if (request.getResponseCode() == 200) {
-                byte[] imageData = request.getResponseData(); // contenu de l'image
-                // Afficher l'image dans un composant d'image
-                EncodedImage image = EncodedImage.create(imageData);
-                ImageViewer viewer = new ImageViewer(image);
-                Form form = new Form();
-                form.add(viewer);
-                form.show();
-            }
-        });
-        NetworkManager.getInstance().addToQueueAndWait(request);
     }
 
     //fetch
